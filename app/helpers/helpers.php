@@ -89,13 +89,20 @@ function csrf_token(): ?string
 }
 
 
-/**
- * @throws Exception
- */
 function view(string $view, $data = [])
 {
     $views = realpath(dirname(__DIR__) . '/resources/views');
     $cache = realpath(dirname(__DIR__) . '/resources/cache') ?? mkdir(realpath(dirname(__DIR__) . '/resources/cache'));
     $blade = new BladeOne($views, $cache, BladeOne::MODE_DEBUG); // MODE_DEBUG allows to pinpoint troubles.
-    echo $blade->run($view, $data); // it calls /views/hello.blade.php
+    try {
+        echo $blade->run($view, $data);
+        return;
+    } catch (Exception $e) {
+        throw new Exception($e);
+    }
+}
+
+function asset(string $path)
+{
+    return $_ENV['URL_ROOT'] . '/asset/' . $path;
 }
